@@ -1,0 +1,178 @@
+import random
+
+class MinesweeperGame:
+    def __init__(self, rows=9, cols=9, num_mines=10):
+        """Inicializa el juego con dimensiones y número de minas."""
+        self.rows = rows
+        self.cols = cols
+        self.num_mines = num_mines
+        self.board = self._create_board()
+        self.revealed = [[False for _ in range(cols)] for _ in range(rows)] # Lo que el jugador ve
+        self.is_game_over = False
+
+    def _create_board(self):
+        """Crea el tablero inicial colocando minas y luego los números."""
+        # 1. Inicializar con minas (True = Mina)
+        board = [[False for _ in range(self.cols)] for _ in range(self.rows)]
+        mines_placed = random.sample(range(self.rows * self.cols), self.num_mines)
+        mine_locations = set()
+        for i in mines_placed:
+            r, c = divmod(i, self.cols)
+            board[r][c] = 'M' # Usamos 'M' para representar mina en el tablero interno
+
+        # 2. Calcular los números de seguridad (0 a 8)
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if board[r][c] == 'M':
+                    continue # No calcular nada sobre una mina
+                else:
+                    count = 0
+                    # Revisar los 8 vecinos (incluyendo diagonales)
+                    for dr in [-1, 0, 1]:
+                        for dc in [-1, 0, 1]:
+                            if dr == 0 and dc == 0:
+                                continue # No contar la celda actual
+                            
+                            nr, nc = r + dr, c + dc
+                            
+                            # Verificar límites y si hay mina en el vecino
+                            if (0 <= nr < self.rows and 
+                                    0 <= nc < self.cols and 
+                                    board[nr][nc] == 'M'):
+                                count += 1
+                    board[r][c] = str(count) # Almacenar el número
+
+        return board
+
+    def print_board(self):
+        """Imprime el estado visible del tablero (lo que ve el jugador)."""
+        print("\n" + "=" * (self.cols * 4))
+        for r in range(self.rows):
+            row_display = []
+            for c in range(self.cols):
+                if not self.revealed[r][c]:
+                    # Si no ha sido revelado, muestra un carácter oculto
+                    row_display.append("[?]") 
+                else:
+                    # Muestra el contenido real (número o mina)
+                    contenido = self.board[r][c]
+                    if contenido == 'M':
+                        row_display.append("💣") # Emoji para la mina
+                    elif contenido == '0':
+                         row_display.append(" ") # Espacio si es 0 (aunque no debería pasar en este diseño)
+                    else:
+                        row_display.append(contenido)
+            print(" ".join(row_display))
+        print("=" * (self.cols * 4))
+
+    def get_user_input(self):
+        """Pide al usuario las coordenadas de la celda a revelar."""
+        while True:
+            try:
+                print("\nIngresa la fila y columna (ej: 0 1) o escribe 'salir' para terminar.")
+                entrada = input("Coordenadas (Fila Columna): ").strip()
+                if entrada.lower() == 'salir':
+                    return None, None
+                
+                partes = entrada.split()
+                if len(partes) != 2:
+                    print("Error: Por favor, ingresa exactamente dos números separados por espacio.")
+                    continue
+
+                row = int(partes[0])
+                col = int(partes[1])
+
+                if 0 <= row < self.rows and 0 <= col < self.cols:
+                    return row, col
+                else:
+                    print(f"Error: Las coordenadas deben estar entre 0 y {self.rows - 1} (Fila) y 0 y {self.cols - 1} (Columna).")
+
+            except ValueError:
+                print("Entrada inválida. Por favor, ingresa solo números.")
+
+
+    def reveal_cell(self, r, c):
+        """Revela la celda en el tablero si no ha sido revelada antes."""
+        if self.revealed[r][c]:
+            print("Ya has revisado esa casilla.")
+            return False
+
+        self.revealed[r][c] = True
+        contenido = self.board[r][c]
+
+        if contenido == 'M':
+            print("\n***************************************")
+            print("¡BOOM! 💣 Has pisado una mina. ¡Juego Terminado!")
+            print("***************************************")
+            self.is_game_over = True
+            return False # Indica que el juego terminó por error
+
+        elif contenido is not None and contenido != 'M':
+            # Si es un número, simplemente lo revelamos
+            print(f"\n✅ Revelado en ({r}, {c}): ¡Es un {contenido}!")
+            self.check_win()
+            return True # Indica que la jugada fue exitosa
+
+        elif contenido == '0': # Esto debería ser manejado por el cálculo, pero es una seguridad
+             print(f"\n✅ Revelado en ({r}, {c}): ¡Es un espacio seguro!")
+             self.check_win()
+             return True
+
+
+    def check_win(self):
+        """Verifica si ha ganado o si debe hacer expansión automática (revelar vecinos vacíos)."""
+        # Lógica simple de victoria: Si todas las celdas NO minadas han sido reveladas.
+        safe_cells = 0
+        total_safe_cells = self.rows * self.cols - self.num_mines
+
+        revealed_count = sum(1 for r in range(self.rows) for c in range(self.cols) if self.revealed[r][c])
+        
+        if revealed_count >= total_safe_cells:
+            print("\n***************************************")
+            print("🎉 ¡FELICIDADES! Has desactivado todas las minas y ganado el juego!")
+            print("***************************************")
+            self.is_game_over = True
+
+
+    def play(self):
+        """Bucle principal del juego."""
+        print("\n=========================================")
+        print("       💣 BUSCA MINAS (MINESWEEPER) 💣     ")
+        print("=========================================")
+        print(f"Tablero de {self.rows}x{self.cols}. Minado: {self.num_mines}")
+
+        while not self.is_game_over:
+            self.print_board()
+            r, c = self.get_user_input()
+
+            if r is None or c is None:
+                break # El usuario eligió salir
+
+            # 1. Intentar revelar la celda
+            jugada_exitosa = self.reveal_cell(r, c)
+
+            # 2. Si el juego no terminó por mina y fue exitoso, intentar expansión automática (solo si es un número '0' o vacío en lógica avanzada)
+            if jugada_exitosa and not self.is_game_over:
+                # Nota: Para una implementación completa de Minesweeper, aquí iría la recursión 
+                # para revelar automáticamente todos los vecinos vacíos (el "flood fill").
+                # Por simplicidad, en esta versión básica, solo revelamos lo que el usuario pide.
+                pass
+
+
+        # Mostrar el tablero final al terminar
+        self.print_board()
+        if self.is_game_over and not self.revealed[r][c]: # Si terminó por mina y no se mostró la última jugada
+             print("\n--- REVELANDO TODO EL TABLERO FINAL ---")
+             # Revelar todo para mostrar dónde estaban las minas perdidas
+             for r in range(self.rows):
+                 for c in range(self.cols):
+                     if self.board[r][c] == 'M':
+                         print("💣", end=" ")
+                     elif not self.revealed[r][c]: # Si no se tocó, pero es seguro (para mostrar el estado final)
+                          # Esto solo sirve para fines de demostración si el juego terminó antes de cubrir todo
+                          pass 
+
+if __name__ == "__main__":
+    # Configuración recomendada: 9x9 con 10 minas
+    game = MinesweeperGame(rows=9, cols=9, num_mines=10)
+    game.play()
