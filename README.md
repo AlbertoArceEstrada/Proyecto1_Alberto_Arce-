@@ -1,4 +1,4 @@
-# Proyecto1_Alberto_Arce-
+# Proyecto_1_Alberto_Arce
 
 
 
@@ -328,23 +328,23 @@ seg_a = d2'·d4' + d1'·d3 + d2·d3 + d1'·d2·d4 + d1·d2'·d3' + d1·d2·d4'
 
 ### 6.1. Descripción del testbench
 
-Se implementaron cinco testbenches en SystemVerilog para validar cada módulo de forma
-independiente y el sistema completo de forma integrada:
+Se implementaron cinco testbenches  para validar cada módulo de forma
+independiente y el sistema completo :
 
-| Archivo | Módulo bajo prueba | Tipo de prueba |
-|---|---|---|
-| `tb_decodificador_paridad` | `decodificador_paridad` | Sin error, error simple en cada bit, doble error |
-| `tb_correccion_error` | `correccion_error` | Corrección de cada bit de dato y de paridad |
-| `tb_despliegue_leds` | `despliegue_leds` | Los 16 valores posibles con verificación PASS/FAIL |
-| `tb_despliegue_7seg` | `despliegue_7seg_catodo_comun` | Los 16 dígitos hex con PASS/FAIL automático |
-| `tb_selector` | `selector` | Selección de palabra vs síndrome |
-| `tb_receptor_top` | `receptor_top` (integración) | Sistema completo: sin error, errores simples, doble error |
+| Archivo  | Tipo de prueba |
+|---|--|
+| `tb_decodificador_paridad`  | Sin error, error simple en cada bit, doble error |
+| `tb_correccion_error`  | Corrección de cada bit de dato y de paridad |
+| `tb_despliegue_leds`  | Los 16 valores posibles con verificación PASS/FAIL |
+| `tb_despliegue_7seg`  | Los 16 dígitos hex con PASS/FAIL automático |
+| `tb_selector`  | Selección de palabra vs síndrome |
+| `tb_receptor_top`  | Sistema completo: sin error, errores simples, doble error |
 
-### 6.2. Análisis de la simulación de integración
+### 6.2. Análisis de la simulación de todo el sistema
 
-El testbench `tb_receptor_top` ejercita el sistema completo con 8 vectores de prueba.
-El dato de referencia utilizado es `d1=1, d2=0, d3=1, d4=1` (valor hexadecimal **B**),
-cuyas paridades correctas son `P1=0, P2=1, P4=0, P0=0`.
+El testbench `tb_receptor_top` revisa el sistema completo con 8 vectores de prueba.
+El dato de referencia utilizado es `d1=1, d2=0, d3=1, d4=1` (valor hexadecimal seria **B**),
+cuyas paridades correctas serian `P1=0, P2=1, P4=0, P0=0`.
 
 ---
 
@@ -355,7 +355,7 @@ Los LEDs reflejan el dato original `1011` y el display muestra correctamente el 
 hexadecimal **b**. El bit de paridad global P0 no detecta discrepancia, por lo que
 `error_led` permanece en cero.
 
-![Simulación caso 1 — sin error](doc/sim_caso1_sin_error.png)
+![Simulación caso 1 — sin error](doc/sim_sin_error.png)
 
 ---
 
@@ -370,23 +370,22 @@ hexadecimal **b**. El bit de paridad global P0 no detecta discrepancia, por lo q
 
 En los cuatro casos el módulo `correccion_error` identificó el bit señalado por el
 síndrome y lo invirtió mediante XOR, recuperando el dato original `1011`. El display
-muestra el valor numérico del síndrome, permitiendo identificar visualmente la posición
-del bit corregido.
+muestra el valor numérico del síndrome, permitiendo identificar  la posición
+del bit que estaba dañado
 
-![Simulación casos 2 a 5 — errores simples](doc/sim_casos2_5_errores_simples.png)
+![Simulación casos 2 a 5 — errores simples](doc/sim_casos_simples.png)
 
 ---
 
 #### Caso 6 — Doble error
 
-Al invertir simultáneamente P1 y d1, el síndrome de paridad interna indica la posición
-`010`, pero el bit de paridad global P0 detecta una discrepancia: el número total de
+Al invertir  P1 y d1, el síndrome de paridad interna indica la posición
+`010`, pero el bit de paridad global P0 detecta un problema: el número total de
 bits en error es par, lo que es inconsistente con un error simple. Esto activa
-`error_led = 1`. El sistema no intenta corregir la palabra, comportamiento correcto
-del algoritmo SECDED (Single Error Correction, Double Error Detection). Los LEDs
-muestran `0011`, el dato recibido sin modificar.
+`error_led = 1`. El sistema no intenta corregir la palabra.
+Los LEDs  muestran `0011`, el dato recibido sin modificar.
 
-![Simulación caso 6 — doble error](doc/sim_caso6_doble_error.png)
+![Simulación caso 6 — doble error](doc/sim_doble_error.png)
 
 ---
 
@@ -394,19 +393,17 @@ muestran `0011`, el dato recibido sin modificar.
 
 Los valores extremos `0x0` y `0xF` son procesados correctamente. En ambos casos el
 síndrome es `000` y `error_led` permanece en cero, confirmando que la lógica de
-paridad es consistente para los casos frontera del rango de datos.
+paridad esta bien para los casos extremos.
 
-![Simulación casos 7 y 8 — casos límite](doc/sim_casos7_8_limite.png)
+![Simulación casos 7 y 8 — casos límite](doc/sim_casos_limite.png)
 
 ---
 
 #### Forma de onda — GTKWave
 
 La siguiente figura muestra las formas de onda del sistema completo capturadas en
-GTKWave. Se observan las entradas `P0`–`d4`, el síndrome calculado, la palabra
-corregida, y la señal `error_led` respondiendo correctamente a cada vector de prueba.
-
-![Formas de onda GTKWave — receptor_top](doc/sim_gtkwave_receptor_top.png)
+GTKWave. 
+![Formas de onda GTKWave — receptor_top](doc/simulacion_receptor_graficas.png)
 
 ---
 
