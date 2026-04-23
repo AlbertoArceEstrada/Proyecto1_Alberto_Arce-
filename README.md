@@ -355,7 +355,7 @@ Los LEDs reflejan el dato original `1011` y el display muestra correctamente el 
 hexadecimal **b**. El bit de paridad global P0 no detecta discrepancia, por lo que
 `error_led` permanece en cero.
 
-![Simulación caso 1 — sin error](doc/sim_sin_error.jpg)
+![Simulación caso 1 — sin error](receptor/doc/sim_sin_error.jpg)
 
 ---
 
@@ -373,7 +373,7 @@ síndrome y lo invirtió mediante XOR, recuperando el dato original `1011`. El d
 muestra el valor numérico del síndrome, permitiendo identificar  la posición
 del bit que estaba dañado
 
-![Simulación casos 2 a 5 — errores simples](doc/sim_casos_simples.jpg)
+![Simulación casos 2 a 5 — errores simples](receptor/doc/sim_errores_simples.jpg)
 
 ---
 
@@ -385,7 +385,7 @@ bits en error es par, lo que es inconsistente con un error simple. Esto activa
 `error_led = 1`. El sistema no intenta corregir la palabra.
 Los LEDs  muestran `0011`, el dato recibido sin modificar.
 
-![Simulación caso 6 — doble error](doc/sim_doble_error.jpg)
+![Simulación caso 6 — doble error](receptor/doc/sim_doble_error.jpg)
 
 ---
 
@@ -395,7 +395,7 @@ Los valores extremos `0x0` y `0xF` son procesados correctamente. En ambos casos 
 síndrome es `000` y `error_led` permanece en cero, confirmando que la lógica de
 paridad esta bien para los casos extremos.
 
-![Simulación casos 7 y 8 — casos límite](doc/sim_casos_limite.jpg)
+![Simulación casos 7 y 8 — casos límite](receptor/doc/sim_casos_limite.jpg)
 
 ---
 
@@ -403,7 +403,7 @@ paridad esta bien para los casos extremos.
 
 La siguiente figura muestra las formas de onda del sistema completo capturadas en
 GTKWave. 
-![Formas de onda GTKWave — receptor_top](doc/simulacion_receptor_graficas.jpg)
+![Formas de onda GTKWave — receptor_top](receptor/doc/simulacion_receptor_graficas.jpg)
 
 ---
 
@@ -445,6 +445,8 @@ Datos obtenidos tras síntesis con Yosys y place-and-route con nextpnr-gowin sob
 |----------|------:|-----------:|-----------:|
 | SLICE    |    58 |       8640 |        0 % |
 | IOB      |    35 |        274 |       12 % |
+
+
 Imagen de los datos en terminal el doc de la carpeta "receptor" con el nombre "datos de sintesis"
 
 ### 7.2. Análisis
@@ -461,7 +463,7 @@ Los 35 pines IOB utilizados (12% de 274) corresponden a las 12 entradas (palabra
 
 **Problema:** No estar seguro si la falla en el compotameinto del sistema es debido a una mala conexion o componente o a la programacion 
 
-**Solución:** dividir la verificacion por partes, forzar estados en la programcion y ver con el multimetro si son lo esperado 
+**Solución:** dividir la verificacion por partes, forzar estados en la programcion y ver con el multimetro si son lo esperado revisando pin por pin 
 
 ### 8.2. Las constrains no coincidian con las conexiones reales 
 
