@@ -21,7 +21,7 @@ SOURCES = \
 	../design/despliegue_LEDs.sv
 #Fuente de simulacion
 #aca va el testbench que quieran simular
-TESTBENCH = ../sim/tb_receptor_top #receptor_tb.sv
+TESTBENCH = ../sim/tb_receptor_top.sv
 
 # Constraints para el proyecto
 #aca va el archivo de constraints del proyecto

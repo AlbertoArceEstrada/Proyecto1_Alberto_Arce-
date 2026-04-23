@@ -14,7 +14,7 @@ module tb_receptor_top;
     logic ds1, ds2, ds3, ds4;
     logic s8, s4, s2, s1;
     logic led0, led1, led2, led3, led4, led5;
-    logic led_doble_error;
+    logic error_led;
     logic seg_a, seg_b, seg_c, seg_d, seg_e, seg_f, seg_g, seg_dp;
 
     // DUT
@@ -26,7 +26,7 @@ module tb_receptor_top;
         .s8(s8), .s4(s4), .s2(s2), .s1(s1),
         .led0(led0), .led1(led1), .led2(led2), .led3(led3),
         .led4(led4), .led5(led5),
-        .led_doble_error(led_doble_error),
+        .error_led(error_led),
         .seg_a(seg_a), .seg_b(seg_b), .seg_c(seg_c), .seg_d(seg_d),
         .seg_e(seg_e), .seg_f(seg_f), .seg_g(seg_g), .seg_dp(seg_dp)
     );
@@ -45,11 +45,13 @@ module tb_receptor_top;
         $display("  LEDs dato : %b%b%b%b (d1 d2 d3 d4)",led3,led2,led1,led0);
         $display("  Sindrome  : s4=%b s2=%b s1=%b", s4,s2,s1);
         $display("  Display   : segs=%b%b%b%b%b%b%b", seg_a,seg_b,seg_c,seg_d,seg_e,seg_f,seg_g);
-        $display("  Doble err : %b", led_doble_error);
+        $display("  Doble err : %b", error_led);
         $display("");
     endtask
 
     initial begin
+    $dumpfile("receptor_top.vcd");
+    $dumpvars(0, tb_receptor_top);
         $display("========================================");
         $display("  TB INTEGRACIÓN: receptor_top SECDED  ");
         $display("========================================\n");
@@ -79,7 +81,7 @@ module tb_receptor_top;
 
         // ── Doble error: P1 y d1 invertidos
         aplicar(0,1,1,0,0,0,1,1, 0,0,0,0,
-                "6) DOBLE ERROR | led_doble_error debe=1");
+                "6) DOBLE ERROR | error_led debe=1");
 
         // ── Dato todo ceros (0000)
         // P1=0^0^0=0, P2=0^0^0=0, P4=0^0^0=0, P0=0
