@@ -355,7 +355,7 @@ Los LEDs reflejan el dato original `1011` y el display muestra correctamente el 
 hexadecimal **b**. El bit de paridad global P0 no detecta discrepancia, por lo que
 `error_led` permanece en cero.
 
-![Simulación caso 1 — sin error](doc/sim_sin_error.png)
+![Simulación caso 1 — sin error](doc/sim_sin_error.jpg)
 
 ---
 
@@ -373,7 +373,7 @@ síndrome y lo invirtió mediante XOR, recuperando el dato original `1011`. El d
 muestra el valor numérico del síndrome, permitiendo identificar  la posición
 del bit que estaba dañado
 
-![Simulación casos 2 a 5 — errores simples](doc/sim_casos_simples.png)
+![Simulación casos 2 a 5 — errores simples](doc/sim_casos_simples.jpg)
 
 ---
 
@@ -385,7 +385,7 @@ bits en error es par, lo que es inconsistente con un error simple. Esto activa
 `error_led = 1`. El sistema no intenta corregir la palabra.
 Los LEDs  muestran `0011`, el dato recibido sin modificar.
 
-![Simulación caso 6 — doble error](doc/sim_doble_error.png)
+![Simulación caso 6 — doble error](doc/sim_doble_error.jpg)
 
 ---
 
@@ -395,7 +395,7 @@ Los valores extremos `0x0` y `0xF` son procesados correctamente. En ambos casos 
 síndrome es `000` y `error_led` permanece en cero, confirmando que la lógica de
 paridad esta bien para los casos extremos.
 
-![Simulación casos 7 y 8 — casos límite](doc/sim_casos_limite.png)
+![Simulación casos 7 y 8 — casos límite](doc/sim_casos_limite.jpg)
 
 ---
 
@@ -403,7 +403,7 @@ paridad esta bien para los casos extremos.
 
 La siguiente figura muestra las formas de onda del sistema completo capturadas en
 GTKWave. 
-![Formas de onda GTKWave — receptor_top](doc/simulacion_receptor_graficas.png)
+![Formas de onda GTKWave — receptor_top](doc/simulacion_receptor_graficas.jpg)
 
 ---
 
