@@ -409,7 +409,7 @@ GTKWave.
 
 ### 6.3. Conclusión
 
-Todos los vectores de prueba produjeron los resultados esperados. El sistema receptor
+Todos lo resultados fueron los esperados. El sistema receptor
 implementado es funcional para:
 
 - Detectar y corregir cualquier error simple en los 7 bits de la palabra recibida
@@ -425,7 +425,7 @@ implementado es funcional para:
 
 ### 7.1. Receptor
 
-Datos obtenidos tras síntesis con Yosys y place-and-route con nextpnr-gowin sobre la TangNano 9K (GW1NR-LV9QN88PC6/I5).
+Datos obtenidos tras síntesis con Yosys y place-and-route con nextpnr-gowin sobre la FPGA TangNano 9K 
 
 **Resultados de síntesis (Yosys):**
 
@@ -445,10 +445,11 @@ Datos obtenidos tras síntesis con Yosys y place-and-route con nextpnr-gowin sob
 |----------|------:|-----------:|-----------:|
 | SLICE    |    58 |       8640 |        0 % |
 | IOB      |    35 |        274 |       12 % |
+Imagen de los datos en terminal el doc de la carpeta "receptor" con el nombre "datos de sintesis"
 
 ### 7.2. Análisis
 
-El diseño es exclusivamente **combinacional** (sin flip-flops ni memorias), lo que explica el uso nulo de registros y RAMW. El 100% de la lógica se implementa en LUTs y sus multiplexores asociados.
+El diseño es solo **combinacional** (sin flip-flops ni memorias), lo que explica el uso nulo de registros y RAMW. El 100% de la lógica se implementa en LUTs y sus multiplexores asociados.
 
 El uso de recursos es muy bajo: apenas 58 SLICEs de 8640 disponibles (menos del 1%), lo cual es esperado dado que el receptor implementa únicamente ecuaciones booleanas para detección y corrección de errores, decodificación de display y multiplexado de salidas. La FPGA TangNano 9K tiene capacidad ampliamente suficiente para alojar tanto el transmisor como el receptor en el mismo dispositivo si fuera necesario.
 
@@ -456,33 +457,17 @@ Los 35 pines IOB utilizados (12% de 274) corresponden a las 12 entradas (palabra
 
 ## 8. Problemas Encontrados y Soluciones Aplicadas
 
-### 8.1. Niveles indefinidos en la interconexión entre FPGAs
+### 8.1. Dificultad para verificar el sistema fisico
 
-**Problema:** Al conectar las líneas de datos entre el transmisor y el receptor sin resistencias de pull-down, los pines de entrada del receptor leían niveles indefinidos cuando ningún dato era transmitido activamente.
+**Problema:** No estar seguro si la falla en el compotameinto del sistema es debido a una mala conexion o componente o a la programacion 
 
-**Solución:** Se instalaron resistencias de pull-down de 10 kΩ en cada una de las 7 líneas de datos, tal como se indica en el diagrama de interconexión (Figura 2 del enunciado). Esto asegura que las líneas no transmitidas queden en nivel lógico bajo definido.
+**Solución:** dividir la verificacion por partes, forzar estados en la programcion y ver con el multimetro si son lo esperado 
 
-### 8.2. Manejo del síndrome cero en el display
+### 8.2. Las constrains no coincidian con las conexiones reales 
 
-**Problema:** Cuando no hay error (`sindrome = 000`), el display debía mostrar un guion (`-`) en el segmento G para indicar ausencia de error, en lugar de mostrar el número `0`.
+**Problema:** algunas salidas estaban inveridas o en pines incorrectos 
 
-**Solución:** El módulo decodificador de paridad tiene un caso especial: cuando el síndrome calculado es `000`, la salida enviada al módulo de display es `3'b111` (valor 7 en binario, que en el display con la codificación usada activa únicamente el segmento G, mostrando el guion).
+**Solución:** planear mejor la connexiones y usar cables de distincos colores para identificar mas facilmente cual parte es cual
 
-### 8.3. Mapeo del cuarto bit en el selector
 
-**Problema:** El síndrome es de 3 bits, pero el selector externo requiere 4 bits para ser consistente con la palabra de datos de 4 bits.
 
-**Solución:** El cuarto bit del vector de posición de error se mapea a `0` (`pos_error_ext = {1'b0, sindrome}`), ya que ningún circuito lo utiliza como entrada determinante, tal como sugiere el enunciado.
-
-### 8.4. [Problema adicional del equipo]
-
-> **[COMPLETAR con problemas reales encontrados durante el desarrollo, pruebas en hardware o simulación]**
-
-**Problema:** ...
-
-**Solución:** ...
-
----
-
-*Repositorio del proyecto: [URL del repositorio Git del equipo]*  
-*Última actualización: [fecha de entrega]*
